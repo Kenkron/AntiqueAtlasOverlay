@@ -37,15 +37,17 @@ public class AAORenderEventReciever {
 	 * I know public variables can be messed with, but that's a risk I'm willing
 	 * to take
 	 */
-	public static int BORDER_X = 16, BORDER_Y = 12;
+	public static int BORDER_X = 8, BORDER_Y = 6;
 
-	int TILE_SIZE = 16;
+	public static final int TILE_SIZE = 16;
+	public static final int HALF_TILE_SIZE = TILE_SIZE/2;
 	
 	@SubscribeEvent(priority = cpw.mods.fml.common.eventhandler.EventPriority.NORMAL)
 	public void eventHandler(RenderGameOverlayEvent event) {
 		EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
 		Integer atlas = getPlayerAtlas(player);
-		if (atlas != null) {
+		//Atlas must be in the hotbar
+		if (atlas != null  && atlas.intValue()<9) {
 			int gamewidth = event.resolution.getScaledWidth();
 			int gameheight = event.resolution.getScaledHeight();
 			// the inherant size of the map is a bit too large
@@ -81,50 +83,35 @@ public class AAORenderEventReciever {
 		float scissorScaleX = Minecraft.getMinecraft().displayWidth*1.0f/res.getScaledWidth();
 		float scissorScaleY = mcHeight*1.0f/res.getScaledHeight();
 		GL11.glScissor((int)(shape.minX*scissorScaleX), (int)(mcHeight-shape.maxY*scissorScaleY), (int)(shape.getWidth()*scissorScaleX), (int)(shape.getHeight()*scissorScaleY));
-		//GL11.glScissor(0, 0, shape.getWidth()*scissorScaleX, shape.getHeight()*scissorScaleY);
-		//GL11.glScissor(shape.minX, shape.minY, shape.getWidth(), shape.getHeight());
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		AtlasRenderHelper.drawFullTexture(Textures.BOOK, 0,
-				0, res.getScaledWidth(), res.getScaledHeight());
-		// Find chunk coordinates of the top left corner of the map.
-		// The 'roundToBase' is required so that when the map scales below the
-		// threshold the tiles don't change when map position changes slightly.
-		// The +-2 at the end provide margin so that tiles at the edges of
-		// the page have their stitched texture correct.
-/*		int mapStartX = MathUtil.roundToBase(
-						(int) Math.floor(-shape.getWidth()/2d), 1);
-		int mapStarty = MathUtil.roundToBase(
-				(int) Math.floor(-shape.getWidth()/2d), 1);
-		int mapEndX = MathUtil.roundToBase((int) Math.ceil(((double) MAP_WIDTH
-				/ 2d - mapOffsetX + 2 * tileHalfSize)
-				/ mapScale / 16d), tile2ChunkScale);
-		int mapEndZ = MathUtil.roundToBase((int) Math.ceil(((double) MAP_HEIGHT
-				/ 2d - mapOffsetY + 2 * tileHalfSize)
-				/ mapScale / 16d), tile2ChunkScale);
-		int mapStartScreenX = getGuiX() + WIDTH / 2
-				+ (int) ((mapStartX << 4) * mapScale) + mapOffsetX;
-		int mapStartScreenY = getGuiY() + HEIGHT / 2
-				+ (int) ((mapStartZ << 4) * mapScale) + mapOffsetY;
-*/
+		
 		DimensionData biomeData = AntiqueAtlasMod.atlasData.getAtlasData(
 				atlasID, Minecraft.getMinecraft().theWorld).getDimensionData(
 				dimension);
 
+		int CHUNKSIZE = 16;
+		
 		TileRenderIterator iter = new TileRenderIterator(biomeData);
-		iter.setScope(new Rect((int)position.xCoord/16-12,(int)position.zCoord-8,(int)position.xCoord/16+12,(int)position.zCoord+8));
+		Rect iteratorScope = new Rect((int)position.xCoord/CHUNKSIZE-6,(int)position.zCoord/CHUNKSIZE-3,(int)position.xCoord/CHUNKSIZE+4,(int)position.zCoord/CHUNKSIZE+3);
+		iter.setScope(iteratorScope);
+		
 		iter.setStep(1);
-		int shapeMiddleX = (shape.maxX+shape.minX)/2;
-		int shapeMiddleY = (shape.maxY+shape.minY)/2;
+		Vec3 chunkPosition = Vec3.createVectorHelper(position.xCoord/CHUNKSIZE,position.yCoord/CHUNKSIZE,position.zCoord/CHUNKSIZE);
+		int shapeMiddleX = (shape.minX+shape.maxX)/2;
+		int shapeMiddleY = (shape.minY+shape.maxY)/2;
 		while (iter.hasNext()) {
 			SubTileQuartet subtiles = iter.next();
 			for (SubTile subtile : subtiles) {
 				if (subtile == null || subtile.tile == null)
 					continue;
+				//Position of this subtile (measured in chunks) relative to the player
+				float relativeChunkPositionX = (float) (subtile.x/2.0+iteratorScope.minX-chunkPosition.xCoord);
+				float relativeChunkPositionY = (float) (subtile.y/2.0+iteratorScope.minY-chunkPosition.zCoord);
 				AtlasRenderHelper.drawAutotileCorner(BiomeTextureMap.instance()
 						.getTexture(subtile.tile), 
-						shapeMiddleX+subtile.x*TILE_SIZE/2-(int)position.xCoord, 
-						shapeMiddleY+subtile.y*TILE_SIZE/2-(int)position.zCoord, 
+						shapeMiddleX+(int)(relativeChunkPositionX*TILE_SIZE),
+						shapeMiddleY+(int)(relativeChunkPositionY*TILE_SIZE),
 						subtile.getTextureU(), subtile
 						.getTextureV(), TILE_SIZE/2);
 			}

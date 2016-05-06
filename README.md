@@ -7,11 +7,9 @@ Antique Atlas Overlay
 
 This is an addon for the [Antique Atlas](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1292324-antique-atlas-v4-2-10-17-12-2015) mod. It displays a minimap based on the first atlas it finds in the player's inventory.
 
-BUGS:
- * Nothing is implemented
-
-
-
+TODO:
+ * Add markers
+ * Configuration
 
 -------------------------------------------
 Forge README:
