@@ -47,7 +47,7 @@ public class AAORenderEventReciever {
 		EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
 		Integer atlas = getPlayerAtlas(player);
 		//Atlas must be in the hotbar
-		if (atlas != null  && atlas.intValue()<9) {
+		if (atlas != null) {
 			int gamewidth = event.resolution.getScaledWidth();
 			int gameheight = event.resolution.getScaledHeight();
 			// the inherant size of the map is a bit too large
@@ -226,10 +226,11 @@ public class AAORenderEventReciever {
 
 	/**
 	 * Convenience method that returns the first atlas ID for all atlas items
-	 * the player is currently carrying. Returns null if there are none.
+	 * the player is currently carrying in the hotbar. Returns null if there are none.
 	 **/
 	public static Integer getPlayerAtlas(EntityPlayer player) {
-		for (ItemStack stack : player.inventory.mainInventory) {
+		for (int i = 0; i<9; i++) {
+			ItemStack stack = player.inventory.mainInventory[i];
 			if (stack != null && stack.getItem() == AntiqueAtlasMod.itemAtlas) {
 				return new Integer(stack.getItemDamage());
 			}
