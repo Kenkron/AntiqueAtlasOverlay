@@ -8,8 +8,10 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -96,6 +98,8 @@ public class AAORenderEventReciever {
 		Rect iteratorScope = new Rect((int)position.xCoord/CHUNKSIZE-6,(int)position.zCoord/CHUNKSIZE-3,(int)position.xCoord/CHUNKSIZE+4,(int)position.zCoord/CHUNKSIZE+3);
 		iter.setScope(iteratorScope);
 		
+		
+		
 		iter.setStep(1);
 		Vec3 chunkPosition = Vec3.createVectorHelper(position.xCoord/CHUNKSIZE,position.yCoord/CHUNKSIZE,position.zCoord/CHUNKSIZE);
 		int shapeMiddleX = (shape.minX+shape.maxX)/2;
@@ -108,18 +112,22 @@ public class AAORenderEventReciever {
 				//Position of this subtile (measured in chunks) relative to the player
 				float relativeChunkPositionX = (float) (subtile.x/2.0+iteratorScope.minX-chunkPosition.xCoord);
 				float relativeChunkPositionY = (float) (subtile.y/2.0+iteratorScope.minY-chunkPosition.zCoord);
-				AtlasRenderHelper.drawAutotileCorner(BiomeTextureMap.instance()
+				//TODO: this is slow
+				OptimizedTileRenderer.drawIndividualAutotileCorner(BiomeTextureMap.instance()
 						.getTexture(subtile.tile), 
 						shapeMiddleX+(int)(relativeChunkPositionX*TILE_SIZE),
 						shapeMiddleY+(int)(relativeChunkPositionY*TILE_SIZE),
 						subtile.getTextureU(), subtile
-						.getTextureV(), TILE_SIZE/2);
+						.getTextureV(), TILE_SIZE/2);/**/
 			}
 		}
-
 		//get GL back to normal
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		GL11.glColor4f(1, 1, 1, 1);
+	}
+
+	public void drawMarkers(Rect shape, int atlasID,
+				Vec3 position, int dimension, ScaledResolution res){
 		/*if (!state.is(HIDING_MARKERS)) {
 			int markersStartX = MathUtil.roundToBase(mapStartX,
 					MarkersData.CHUNK_STEP) / MarkersData.CHUNK_STEP - 1;
@@ -223,7 +231,7 @@ public class AAORenderEventReciever {
 			progressBar.draw((width - 100) / 2, height / 2 - 34);
 		}*/
 	}
-
+	
 	/**
 	 * Convenience method that returns the first atlas ID for all atlas items
 	 * the player is currently carrying in the hotbar. Returns null if there are none.
