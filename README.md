@@ -1,9 +1,9 @@
 Antique Atlas Overlay
 =====================
 
--Minecraft Version: 1.7.10
--Forge Version: 10.13.4.1558
--Dependencies: antiqueatlas-1.7.10-4.2.10
+* Minecraft Version: 1.7.10
+* Forge Version: 10.13.4.1558
+* Dependencies: antiqueatlas-1.7.10-4.2.10
 
 This is an addon for the [Antique Atlas](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1292324-antique-atlas-v4-2-10-17-12-2015) mod. It displays a minimap based on the first atlas it finds in the player's inventory.
 
