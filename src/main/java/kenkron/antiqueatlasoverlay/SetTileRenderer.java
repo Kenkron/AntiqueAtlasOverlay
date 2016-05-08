@@ -11,9 +11,9 @@ import net.minecraft.util.ResourceLocation;
 
 import hunternif.mc.atlas.util.AtlasRenderHelper;
 
-/**The minimap render is a bit slow.  The function that really makes a difference is
- * AtlasRenderHelper.drawAutotileCorner(...).  This makes it faster by
- * storing all of the texture UV coordinates in a hash map keys with the resource, then
+/**The minimap render is a bit slow.  The function that really takes time is
+ * AtlasRenderHelper.drawAutotileCorner(...).  This class makes it faster by
+ * sorting the draw commands by texture, then
  * rendering all of the same textures of a map at once without re-binding.*/
 public class SetTileRenderer {
 	
