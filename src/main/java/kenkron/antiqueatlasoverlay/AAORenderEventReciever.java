@@ -115,8 +115,8 @@ public class AAORenderEventReciever {
 				//TODO: this is slow
 				OptimizedTileRenderer.drawIndividualAutotileCorner(BiomeTextureMap.instance()
 						.getTexture(subtile.tile), 
-						shapeMiddleX+(int)(relativeChunkPositionX*TILE_SIZE),
-						shapeMiddleY+(int)(relativeChunkPositionY*TILE_SIZE),
+						shapeMiddleX+(int)Math.round(relativeChunkPositionX*TILE_SIZE),
+						shapeMiddleY+(int)Math.round(relativeChunkPositionY*TILE_SIZE),
 						subtile.getTextureU(), subtile
 						.getTextureV(), TILE_SIZE/2);/**/
 			}
