@@ -105,7 +105,10 @@ public class AAORenderEventReciever {
 		int shapeMiddleX = (shape.minX+shape.maxX)/2;
 		int shapeMiddleY = (shape.minY+shape.maxY)/2;
 		
-		SetTileRenderer renderer = new SetTileRenderer(TILE_SIZE/2);
+		//SetTileRenderer renderer = new SetTileRenderer(TILE_SIZE/2);
+		
+		OptimisticTileRenderer renderer = new OptimisticTileRenderer();
+		GL11.glBegin(GL11.GL_QUADS);
 		
 		while (iter.hasNext()) {
 			SubTileQuartet subtiles = iter.next();
@@ -116,14 +119,16 @@ public class AAORenderEventReciever {
 				float relativeChunkPositionX = (float) (subtile.x/2.0+iteratorScope.minX-chunkPosition.xCoord);
 				float relativeChunkPositionY = (float) (subtile.y/2.0+iteratorScope.minY-chunkPosition.zCoord);
 				//TODO: this is slow
-				renderer.addTileCorner(BiomeTextureMap.instance()
+				renderer.drawAutotileCorner(BiomeTextureMap.instance()
 						.getTexture(subtile.tile), 
 						shapeMiddleX+(int)Math.round(relativeChunkPositionX*TILE_SIZE),
 						shapeMiddleY+(int)Math.round(relativeChunkPositionY*TILE_SIZE),
-						subtile.getTextureU(), subtile.getTextureV());/**/
+						subtile.getTextureU(), subtile.getTextureV(),TILE_SIZE/2);/**/
 			}
 		}
-		renderer.draw();
+		GL11.glEnd();
+		System.out.println();
+		//renderer.draw();
 		//get GL back to normal
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		GL11.glColor4f(1, 1, 1, 1);
