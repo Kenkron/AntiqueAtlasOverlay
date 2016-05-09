@@ -22,34 +22,34 @@ public class AAOConfig {
 		receiver.ALIGN_RIGHT = config.getBoolean("ALIGN_RIGHT", POSITION,
 				receiver.ALIGN_RIGHT,
 				"If true, the map position's x axis will align 0 to the right\n"
-						+ "of the screen, increasing towards the left.");
+						+ "of the screen, increasing towards the left.\n");
 
 		receiver.ALIGN_BOTTOM = config.getBoolean("ALIGN_BOTTOM", POSITION,
 				receiver.ALIGN_BOTTOM,
 				"If true, the map position's y axis will align 0 to the bottom\n"
-						+ "of the screen, increasing towards the top.");
+						+ "of the screen, increasing towards the top.\n");
 
 		receiver.X = config.getInt("X", POSITION, receiver.X,
 				Integer.MIN_VALUE, Integer.MAX_VALUE,
 				"Map's minimum position along the x axis in GUI pixels.\n"
 						+ "Note that this will change with Minecraft's "
-						+ "GUI scale configuration.");
+						+ "GUI scale configuration.\n");
 
 		receiver.Y = config.getInt("Y", POSITION, receiver.Y,
 				Integer.MIN_VALUE, Integer.MAX_VALUE,
 				"Map's minimum position along the y axis in GUI pixels.\n"
 						+ "Note that this will change with Minecraft's "
-						+ "GUI scale configuration.");
+						+ "GUI scale configuration.\n");
 
-		receiver.WIDTH = config.getInt("WIDTH", POSITION, receiver.WIDTH, 1,
+		receiver.WIDTH = config.getInt("WIDTH", POSITION, receiver.WIDTH, 0,
 				Integer.MAX_VALUE, "Map's width in GUI pixels.\n"
 						+ "Note that this will change with Minecraft's "
-						+ "GUI scale configuration.");
+						+ "GUI scale configuration.\n");
 
-		receiver.HEIGHT = config.getInt("HEIGHT", POSITION, receiver.HEIGHT, 1,
+		receiver.HEIGHT = config.getInt("HEIGHT", POSITION, receiver.HEIGHT, 0,
 				Integer.MAX_VALUE, "Map's height in GUI pixels.\n"
 						+ "Note that this will change with Minecraft's "
-						+ "GUI scale configuration.");
+						+ "GUI scale configuration.\n");
 
 		receiver.TILE_SIZE = config
 				.getInt("TILE_SIZE",
@@ -61,22 +61,19 @@ public class AAOConfig {
 								+ "Note that this will change with Minecraft's "
 								+ "GUI scale configuration.\n"
 								+ "When using a small gui scale, "
-								+ "the map may look better with a TILE_SIZE of 16 or more.\n"
-								+ "(Default: " + receiver.TILE_SIZE + ")");
+								+ "the map may look better with a TILE_SIZE of 16 or more.\n");
 
 		receiver.BORDER_X = config.getFloat("BORDER_X", APPEARANCE,
 				receiver.BORDER_X, 0, 0.5f,
 				"The width of the map border on the left and right "
 						+ "sides of the minimap tiles.\n"
-						+ "Represented as a fraction of the image width."
-						+ "(Default: " + receiver.BORDER_X + ")");
+						+ "Represented as a fraction of the image width.\n");
 
 		receiver.BORDER_Y = config.getFloat("BORDER_Y", APPEARANCE,
 				receiver.BORDER_X, 0, 0.5f,
 				"The width of the map border on the top and bottom "
 						+ "sides of the minimap tiles.\n"
-						+ "Represented as a fraction of the image width.\n"
-						+ "(Default: " + receiver.BORDER_Y + ")");
+						+ "Represented as a fraction of the image width.\n");
 
 		receiver.REQUIRES_HOLD = config
 				.getBoolean(
@@ -84,7 +81,7 @@ public class AAOConfig {
 						APPEARANCE,
 						receiver.REQUIRES_HOLD,
 						"If true, the minimap will show the map of an atlas only while it is held.\n"
-								+ "If false, the minimap will show the map of the first atlas in the hotbar.");
+								+ "If false, the minimap will show the map of the first atlas in the hotbar.\n");
 
 		config.save();
 	}
