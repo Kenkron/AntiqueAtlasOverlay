@@ -41,7 +41,7 @@ public class AAORenderEventReciever {
 	 */
 	public static int BORDER_X = 8, BORDER_Y = 6;
 
-	public static final int TILE_SIZE = 16;
+	public static final int TILE_SIZE = 8;
 	public static final int HALF_TILE_SIZE = TILE_SIZE/2;
 	
 	@SubscribeEvent(priority = cpw.mods.fml.common.eventhandler.EventPriority.NORMAL)
@@ -95,7 +95,12 @@ public class AAORenderEventReciever {
 		int CHUNKSIZE = 16;
 		
 		TileRenderIterator iter = new TileRenderIterator(biomeData);
-		Rect iteratorScope = new Rect((int)position.xCoord/CHUNKSIZE-6,(int)position.zCoord/CHUNKSIZE-3,(int)position.xCoord/CHUNKSIZE+4,(int)position.zCoord/CHUNKSIZE+3);
+		int minChunkX = (int)Math.floor(position.xCoord/CHUNKSIZE-shape.getWidth()/(2*TILE_SIZE));
+		minChunkX -= 1;//If I told you I knew why this is needed, I would be lying
+		int minChunkY = (int)Math.floor(position.zCoord/CHUNKSIZE-shape.getHeight()/(2*TILE_SIZE));
+		int maxChunkX = (int)Math.ceil(position.xCoord/CHUNKSIZE+shape.getWidth()/(2*TILE_SIZE));
+		int maxChunkY = (int)Math.ceil(position.zCoord/CHUNKSIZE+shape.getHeight()/(2*TILE_SIZE));
+		Rect iteratorScope = new Rect(minChunkX,minChunkY,maxChunkX,maxChunkY);
 		iter.setScope(iteratorScope);
 		
 		
@@ -104,7 +109,6 @@ public class AAORenderEventReciever {
 		Vec3 chunkPosition = Vec3.createVectorHelper(position.xCoord/CHUNKSIZE,position.yCoord/CHUNKSIZE,position.zCoord/CHUNKSIZE);
 		int shapeMiddleX = (shape.minX+shape.maxX)/2;
 		int shapeMiddleY = (shape.minY+shape.maxY)/2;
-		
 		SetTileRenderer renderer = new SetTileRenderer(TILE_SIZE/2);
 		
 		while (iter.hasNext()) {
