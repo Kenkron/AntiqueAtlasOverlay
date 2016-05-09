@@ -48,18 +48,18 @@ public class AAORenderEventReciever {
 	/** Dimensions of the minimap */
 	public int WIDTH = GuiAtlas.WIDTH / 2, HEIGHT = GuiAtlas.HEIGHT / 2;
 
-	/** Determins which corner to align to*/
+	/** Determines which corner to align to*/
 	public boolean ALIGN_RIGHT = true, ALIGN_BOTTOM = false;
 
 	/** If true, the minimap will render only while the atlas is held,
 	 * instead of rendering whenever it's in the hotbar.*/
-	public boolean requiresHolding = true;
+	public boolean REQUIRES_HOLD = true;
 	
 	@SubscribeEvent(priority = cpw.mods.fml.common.eventhandler.EventPriority.NORMAL)
 	public void eventHandler(RenderGameOverlayEvent event) {
 		EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
 		Integer atlas = null;
-		if (requiresHolding){
+		if (REQUIRES_HOLD){
 			ItemStack stack = player.getHeldItem();
 			if (stack != null && stack.getItem() == AntiqueAtlasMod.itemAtlas) {
 				atlas = new Integer(stack.getItemDamage());
