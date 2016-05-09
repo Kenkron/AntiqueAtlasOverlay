@@ -9,7 +9,6 @@ This is an addon for the [Antique Atlas](http://www.minecraftforum.net/forums/ma
 
 TODO:
  * Add markers
- * Configuration
 
 -------------------------------------------
 Forge README:
