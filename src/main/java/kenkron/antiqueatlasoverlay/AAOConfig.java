@@ -62,6 +62,16 @@ public class AAOConfig {
 								+ "GUI scale configuration.\n"
 								+ "When using a small gui scale, "
 								+ "the map may look better with a TILE_SIZE of 16 or more.\n");
+		
+		receiver.MARKER_SIZE = config
+				.getInt("MARKER_SIZE",
+						APPEARANCE,
+						receiver.MARKER_SIZE,
+						1,
+						Integer.MAX_VALUE,
+						"The size (in GUI pixels) of a marker on the map.\n"
+								+ "Note that this will change with Minecraft's "
+								+ "GUI scale configuration.\n");
 
 		receiver.BORDER_X = config.getFloat("BORDER_X", APPEARANCE,
 				receiver.BORDER_X, 0, 0.5f,

@@ -1,8 +1,10 @@
 package kenkron.antiqueatlasoverlay;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.lwjgl.opengl.Drawable;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
@@ -26,6 +28,7 @@ import hunternif.mc.atlas.client.Textures;
 import hunternif.mc.atlas.client.TileRenderIterator;
 import hunternif.mc.atlas.client.gui.GuiAtlas;
 import hunternif.mc.atlas.core.DimensionData;
+import hunternif.mc.atlas.marker.DimensionMarkersData;
 import hunternif.mc.atlas.marker.Marker;
 import hunternif.mc.atlas.marker.MarkerTextureMap;
 import hunternif.mc.atlas.marker.MarkersData;
@@ -48,23 +51,34 @@ public class AAORenderEventReciever {
 	/** Dimensions of the minimap */
 	public int WIDTH = GuiAtlas.WIDTH / 2, HEIGHT = GuiAtlas.HEIGHT / 2;
 
-	/** Determines which corner to align to*/
+	/** Determines which corner to align to */
 	public boolean ALIGN_RIGHT = true, ALIGN_BOTTOM = false;
 
-	/** If true, the minimap will render only while the atlas is held,
-	 * instead of rendering whenever it's in the hotbar.*/
+	/**
+	 * If true, the minimap will render only while the atlas is held, instead of
+	 * rendering whenever it's in the hotbar.
+	 */
 	public boolean REQUIRES_HOLD = true;
-	
+
+	/** Size of markers on the minimap */
+	public int MARKER_SIZE = GuiAtlas.MARKER_SIZE / 2;
+
+	/**
+	 * Number of blocks per chunk in minecraft. This is certianly stored
+	 * somewhere else, but I couldn't be bothered to find it.
+	 */
+	public static final int CHUNK_SIZE = 16;
+
 	@SubscribeEvent(priority = cpw.mods.fml.common.eventhandler.EventPriority.NORMAL)
 	public void eventHandler(RenderGameOverlayEvent event) {
 		EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
 		Integer atlas = null;
-		if (REQUIRES_HOLD){
+		if (REQUIRES_HOLD) {
 			ItemStack stack = player.getHeldItem();
 			if (stack != null && stack.getItem() == AntiqueAtlasMod.itemAtlas) {
 				atlas = new Integer(stack.getItemDamage());
 			}
-		}else{
+		} else {
 			atlas = getPlayerAtlas(player);
 		}
 		if (atlas != null) {
@@ -97,6 +111,7 @@ public class AAORenderEventReciever {
 				shape.minY + Math.round(BORDER_Y * shape.getHeight()),
 				shape.maxX - Math.round(BORDER_X * shape.getWidth()),
 				shape.maxY - Math.round(BORDER_Y * shape.getHeight()));
+		drawMarkers(innerShape, atlasID, position, dimension, res);
 		drawTiles(innerShape, atlasID, position, dimension, res);
 	}
 
@@ -105,14 +120,7 @@ public class AAORenderEventReciever {
 		GL11.glEnable(GL11.GL_SCISSOR_TEST);
 		// glScissor uses the default window coordinates,
 		// the display window does not. We need to fix this
-		int mcHeight = Minecraft.getMinecraft().displayHeight;
-		float scissorScaleX = Minecraft.getMinecraft().displayWidth * 1.0f
-				/ res.getScaledWidth();
-		float scissorScaleY = mcHeight * 1.0f / res.getScaledHeight();
-		GL11.glScissor((int) (shape.minX * scissorScaleX),
-				(int) (mcHeight - shape.maxY * scissorScaleY),
-				(int) (shape.getWidth() * scissorScaleX),
-				(int) (shape.getHeight() * scissorScaleY));
+		glScissorGUI(shape, res);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
@@ -120,27 +128,14 @@ public class AAORenderEventReciever {
 				atlasID, Minecraft.getMinecraft().theWorld).getDimensionData(
 				dimension);
 
-		int CHUNKSIZE = 16;
-
 		TileRenderIterator iter = new TileRenderIterator(biomeData);
-		int minChunkX = (int) Math.floor(position.xCoord / CHUNKSIZE
-				- shape.getWidth() / (2 * TILE_SIZE));
-		minChunkX -= 1;// IDK
-		int minChunkY = (int) Math.floor(position.zCoord / CHUNKSIZE
-				- shape.getHeight() / (2 * TILE_SIZE));
-		minChunkY -= 1;// IDK
-		int maxChunkX = (int) Math.ceil(position.xCoord / CHUNKSIZE
-				+ shape.getWidth() / (2 * TILE_SIZE));
-		int maxChunkY = (int) Math.ceil(position.zCoord / CHUNKSIZE
-				+ shape.getHeight() / (2 * TILE_SIZE));
-		Rect iteratorScope = new Rect(minChunkX, minChunkY, maxChunkX,
-				maxChunkY);
+		Rect iteratorScope = getChunkCoverage(position, shape);
 		iter.setScope(iteratorScope);
 
 		iter.setStep(1);
 		Vec3 chunkPosition = Vec3.createVectorHelper(position.xCoord
-				/ CHUNKSIZE, position.yCoord / CHUNKSIZE, position.zCoord
-				/ CHUNKSIZE);
+				/ CHUNK_SIZE, position.yCoord / CHUNK_SIZE, position.zCoord
+				/ CHUNK_SIZE);
 		int shapeMiddleX = (shape.minX + shape.maxX) / 2;
 		int shapeMiddleY = (shape.minY + shape.maxY) / 2;
 		SetTileRenderer renderer = new SetTileRenderer(TILE_SIZE / 2);
@@ -176,32 +171,40 @@ public class AAORenderEventReciever {
 
 	public void drawMarkers(Rect shape, int atlasID, Vec3 position,
 			int dimension, ScaledResolution res) {
+
+		GL11.glEnable(GL11.GL_SCISSOR_TEST);
+		// glScissor uses the default window coordinates,
+		// the display window does not. We need to fix this
+		glScissorGUI(shape, res);
+
+		// double iconScale = getIconScale();
+
+		// biomeData needed to prevent undiscovered markers from appearing
+		DimensionData biomeData = AntiqueAtlasMod.atlasData.getAtlasData(
+				atlasID, Minecraft.getMinecraft().theWorld).getDimensionData(
+				dimension);
+		DimensionMarkersData globalMarkersData = AntiqueAtlasMod.globalMarkersData
+				.getData().getMarkersDataInDimension(dimension);
+
+		// Draw global markers:
+		drawMarkersData(globalMarkersData, shape, biomeData, position);
+
+		MarkersData markersData = AntiqueAtlasMod.markersData.getMarkersData(
+				atlasID, Minecraft.getMinecraft().theWorld);
+		DimensionMarkersData localMarkersData = null;
+		if (markersData != null) {
+			localMarkersData = markersData.getMarkersDataInDimension(dimension);
+		}
+
+		// Draw local markers:
+		drawMarkersData(localMarkersData, shape, biomeData, position);
+
+		// get GL back to normal
+		GL11.glDisable(GL11.GL_SCISSOR_TEST);
+		GL11.glColor4f(1, 1, 1, 1);
+
+		// Overlay the frame so that edges of the map are smooth:
 		/*
-		 * if (!state.is(HIDING_MARKERS)) { int markersStartX =
-		 * MathUtil.roundToBase(mapStartX, MarkersData.CHUNK_STEP) /
-		 * MarkersData.CHUNK_STEP - 1; int markersStartZ =
-		 * MathUtil.roundToBase(mapStartZ, MarkersData.CHUNK_STEP) /
-		 * MarkersData.CHUNK_STEP - 1; int markersEndX =
-		 * MathUtil.roundToBase(mapEndX, MarkersData.CHUNK_STEP) /
-		 * MarkersData.CHUNK_STEP + 1; int markersEndZ =
-		 * MathUtil.roundToBase(mapEndZ, MarkersData.CHUNK_STEP) /
-		 * MarkersData.CHUNK_STEP + 1; double iconScale = getIconScale();
-		 * 
-		 * // Draw global markers: for (int x = markersStartX; x <= markersEndX;
-		 * x++) { for (int z = markersStartZ; z <= markersEndZ; z++) {
-		 * List<Marker> markers = globalMarkersData.getMarkersAtChunk( x, z); if
-		 * (markers == null) continue; for (Marker marker : markers) {
-		 * renderMarker(marker, iconScale); } } }
-		 * 
-		 * // Draw local markers: if (localMarkersData != null) { for (int x =
-		 * markersStartX; x <= markersEndX; x++) { for (int z = markersStartZ; z
-		 * <= markersEndZ; z++) { List<Marker> markers = localMarkersData
-		 * .getMarkersAtChunk(x, z); if (markers == null) continue; for (Marker
-		 * marker : markers) { renderMarker(marker, iconScale); } } } } }
-		 * 
-		 * GL11.glDisable(GL11.GL_SCISSOR_TEST);
-		 * 
-		 * // Overlay the frame so that edges of the map are smooth:
 		 * GL11.glColor4f(1, 1, 1, 1);
 		 * AtlasRenderHelper.drawFullTexture(Textures.BOOK_FRAME, getGuiX(),
 		 * getGuiY(), WIDTH, HEIGHT); double iconScale = getIconScale();
@@ -243,6 +246,83 @@ public class AAORenderEventReciever {
 		 * drawDefaultBackground(); progressBar.draw((width - 100) / 2, height /
 		 * 2 - 34); }
 		 */
+
+	}
+
+	protected void drawMarkersData(DimensionMarkersData markersData,
+			Rect shape, DimensionData biomeData, Vec3 position) {
+		
+		Rect chunks = getChunkCoverage(position, shape);
+
+		int shapeMiddleX = (shape.minX + shape.maxX) / 2;
+		int shapeMiddleY = (shape.minY + shape.maxY) / 2;
+
+		// Draw global markers:
+		for (int x = chunks.minX; x <= chunks.maxX; x++) {
+			for (int z = chunks.minY; z <= chunks.maxY; z++) {
+
+				List<Marker> markers = markersData.getMarkersAtChunk(x, z);
+				if (markers == null)
+					continue;
+				for (Marker marker : markers) {
+					// Position of this marker (measured in chunks) relative to
+					// the
+					// player
+					float relativeChunkPositionX = (float) (marker.getX() - position.xCoord)
+							/ CHUNK_SIZE;
+					float relativeChunkPositionY = (float) (marker.getZ() - position.zCoord)
+							/ CHUNK_SIZE;
+					int guiX = Math.round(shapeMiddleX + relativeChunkPositionX
+							* TILE_SIZE);
+					int guiY = Math.round(shapeMiddleY + relativeChunkPositionY
+							* TILE_SIZE);
+					renderMarker(marker, guiX, guiY, biomeData);
+				}
+			}
+		}
+	}
+
+	protected void renderMarker(Marker marker, int x, int y,
+			DimensionData biomeData) {
+		if (!marker.isVisibleAhead()
+				&& !biomeData.hasTileAt(marker.getChunkX(), marker.getChunkZ())) {
+			return;
+		}
+		GL11.glColor4f(1, 1, 1, 1);
+		SetTileRenderer.drawTexture(MarkerTextureMap
+				.instance().getTexture(marker.getType()), x, y, MARKER_SIZE,
+				MARKER_SIZE);
+//		 AtlasRenderHelper.drawFullTexture(MarkerTextureMap.instance()
+//		 .getTexture(marker.getType()), x, y, MARKER_SIZE, MARKER_SIZE);
+	}
+
+	protected Rect getChunkCoverage(Vec3 position, Rect windowShape) {
+		int CHUNKSIZE = 16;
+		int minChunkX = (int) Math.floor(position.xCoord / CHUNKSIZE
+				- windowShape.getWidth() / (2f * TILE_SIZE));
+		minChunkX -= 1;// IDK
+		int minChunkY = (int) Math.floor(position.zCoord / CHUNKSIZE
+				- windowShape.getHeight() / (2f * TILE_SIZE));
+		minChunkY -= 1;// IDK
+		int maxChunkX = (int) Math.ceil(position.xCoord / CHUNKSIZE
+				+ windowShape.getWidth() / (2f * TILE_SIZE));
+		int maxChunkY = (int) Math.ceil(position.zCoord / CHUNKSIZE
+				+ windowShape.getHeight() / (2f * TILE_SIZE));
+		return new Rect(minChunkX, minChunkY, maxChunkX, maxChunkY);
+	}
+
+	/** Calls GL11.glScissor, but uses GUI coordinates */
+	protected void glScissorGUI(Rect shape, ScaledResolution res) {
+		// glScissor uses the default window coordinates,
+		// the display window does not. We need to fix this
+		int mcHeight = Minecraft.getMinecraft().displayHeight;
+		float scissorScaleX = Minecraft.getMinecraft().displayWidth * 1.0f
+				/ res.getScaledWidth();
+		float scissorScaleY = mcHeight * 1.0f / res.getScaledHeight();
+		GL11.glScissor((int) (shape.minX * scissorScaleX),
+				(int) (mcHeight - shape.maxY * scissorScaleY),
+				(int) (shape.getWidth() * scissorScaleX),
+				(int) (shape.getHeight() * scissorScaleY));
 	}
 
 	/**

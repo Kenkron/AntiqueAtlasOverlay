@@ -71,22 +71,18 @@ public class SetTileRenderer {
 	}
 	
 	/**This does not improve framerate...*/
-	protected void drawIndividualAutotileCorner(ResourceLocation texture, int x, int y, int u, int v) {
+	public static void drawTexture(ResourceLocation texture, int x, int y, int w, int h) {
 		//Effectively a call to GL11.glBindTexture(GL11.GL_TEXTURE_2D, p_94277_0_);
 		Minecraft.getMinecraft().renderEngine.bindTexture(texture);
-		float minU = u / 4f;
-		float maxU =(u + 1) / 4f;
-		float minV = v / 6f;
-		float maxV =(v + 1) / 6f;
 		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glTexCoord2f(maxU, maxV);
-		GL11.glVertex2f(x+tileHalfSize, y+ tileHalfSize);
-		GL11.glTexCoord2f(maxU, minV);
-		GL11.glVertex2f(x+tileHalfSize,y);
-		GL11.glTexCoord2f(minU, minV);
+		GL11.glTexCoord2f(1, 1);
+		GL11.glVertex2f(x+w, y+h);
+		GL11.glTexCoord2f(1, 0);
+		GL11.glVertex2f(x+w,y);
+		GL11.glTexCoord2f(0, 0);
 		GL11.glVertex2f(x,y);
-		GL11.glTexCoord2f(minU, maxV);
-		GL11.glVertex2f(x,y+ tileHalfSize);
+		GL11.glTexCoord2f(0, 1);
+		GL11.glVertex2f(x,y+h);
 		GL11.glEnd();
 	}
 }
