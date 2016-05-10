@@ -11,7 +11,7 @@ public class AAOConfig {
 	public static final String POSITION = "Map Position";
 	public static final String APPEARANCE = "Map Appearance";
 
-	public static void load(File file, AAORenderEventReciever receiver) {
+	public static void load(File file, AAORenderEventReceiver receiver) {
 		Configuration config = new Configuration(file, String.valueOf(VERSION));
 		config.setCategoryComment(POSITION,
 				"These settings change the location and size.");

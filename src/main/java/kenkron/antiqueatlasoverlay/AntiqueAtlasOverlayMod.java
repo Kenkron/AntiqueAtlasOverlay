@@ -15,11 +15,11 @@ public class AntiqueAtlasOverlayMod
     public static final String MODID = "AntiqueAtlasOverlay";
     public static final String VERSION = "1.0";
     
-    AAORenderEventReciever renderer;
+    AAORenderEventReceiver renderer;
     
     @EventHandler
     public void preInit(FMLPreInitializationEvent event){
-    	renderer = new AAORenderEventReciever();
+    	renderer = new AAORenderEventReceiver();
     	AAOConfig.load(new File(event.getModConfigurationDirectory(), "AntiqueAtlasOverlay.cfg"), renderer);
     }
     
