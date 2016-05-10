@@ -106,6 +106,7 @@ public class AAORenderEventReceiver {
 	public void drawMinimap(Rect shape, int atlasID, Vec3 position, float rotation,
 			int dimension, ScaledResolution res) {
 		GL11.glColor4f(1, 1, 1, 1);
+		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glAlphaFunc(GL11.GL_GREATER, 0); // So light detail on tiles is
 												// visible
 		AtlasRenderHelper.drawFullTexture(Textures.BOOK, shape.minX,
@@ -127,6 +128,7 @@ public class AAORenderEventReceiver {
 		GL11.glColor4f(1, 1, 1, 1);
 		AtlasRenderHelper.drawFullTexture(Textures.BOOK_FRAME, shape.minX,
 		shape.minY, shape.getWidth(), shape.getHeight());
+		GL11.glDisable(GL11.GL_BLEND);
 	}
 
 	public void drawTiles(Rect shape, int atlasID, Vec3 position,
