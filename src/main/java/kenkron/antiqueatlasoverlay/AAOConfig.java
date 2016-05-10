@@ -62,28 +62,38 @@ public class AAOConfig {
 								+ "GUI scale configuration.\n"
 								+ "When using a small gui scale, "
 								+ "the map may look better with a TILE_SIZE of 16 or more.\n");
-		
-		receiver.MARKER_SIZE = config
-				.getInt("MARKER_SIZE",
+
+		receiver.MARKER_SIZE = config.getInt("MARKER_SIZE", APPEARANCE,
+				receiver.MARKER_SIZE, 1, Integer.MAX_VALUE,
+				"The size (in GUI pixels) of a marker on the map.\n"
+						+ "Note that this will change with Minecraft's "
+						+ "GUI scale configuration.\n");
+
+		receiver.BORDER_X = config
+				.getFloat(
+						"BORDER_X",
 						APPEARANCE,
-						receiver.MARKER_SIZE,
-						1,
-						Integer.MAX_VALUE,
-						"The size (in GUI pixels) of a marker on the map.\n"
-								+ "Note that this will change with Minecraft's "
-								+ "GUI scale configuration.\n");
+						receiver.BORDER_X,
+						0,
+						0.5f,
+						"The width of the map border on the left and right "
+								+ "sides of the minimap tiles.\n"
+								+ "Represented as a fraction of the image width.\n"
+								+ "Below a certain threshold, this border will be overtaken " +
+								"by the map border graphic.\n");
 
-		receiver.BORDER_X = config.getFloat("BORDER_X", APPEARANCE,
-				receiver.BORDER_X, 0, 0.5f,
-				"The width of the map border on the left and right "
-						+ "sides of the minimap tiles.\n"
-						+ "Represented as a fraction of the image width.\n");
-
-		receiver.BORDER_Y = config.getFloat("BORDER_Y", APPEARANCE,
-				receiver.BORDER_X, 0, 0.5f,
-				"The width of the map border on the top and bottom "
-						+ "sides of the minimap tiles.\n"
-						+ "Represented as a fraction of the image width.\n");
+		receiver.BORDER_Y = config
+				.getFloat(
+						"BORDER_Y",
+						APPEARANCE,
+						receiver.BORDER_X,
+						0,
+						0.5f,
+						"The width of the map border on the top and bottom "
+								+ "sides of the minimap tiles.\n"
+								+ "Represented as a fraction of the image width.\n"
+								+ "Below a certain threshold, this border will be overtaken " +
+								"by the map border graphic.\n");
 
 		receiver.REQUIRES_HOLD = config
 				.getBoolean(

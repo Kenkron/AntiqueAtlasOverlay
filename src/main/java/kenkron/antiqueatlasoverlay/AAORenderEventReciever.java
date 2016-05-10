@@ -42,7 +42,7 @@ public class AAORenderEventReciever {
 	 * I know public variables can be messed with, but that's a risk I'm willing
 	 * to take. Fraction of image devoted to each border.
 	 */
-	public float BORDER_X = 0.0625f, BORDER_Y = 0.0625f;
+	public float BORDER_X = 0.0f, BORDER_Y = 0.0f;
 	public int TILE_SIZE = 8;
 
 	/** Position of the minimap relative to it's corner. */
@@ -161,10 +161,10 @@ public class AAORenderEventReciever {
 				renderer.addTileCorner(
 						BiomeTextureMap.instance().getTexture(subtile.tile),
 						shapeMiddleX
-								+ (int) Math.round(relativeChunkPositionX
+								+ (int) Math.floor(relativeChunkPositionX
 										* TILE_SIZE),
 						shapeMiddleY
-								+ (int) Math.round(relativeChunkPositionY
+								+ (int) Math.floor(relativeChunkPositionY
 										* TILE_SIZE), subtile.getTextureU(),
 						subtile.getTextureV());/**/
 			}
@@ -252,8 +252,6 @@ public class AAORenderEventReciever {
 				shape.maxX+MARKER_SIZE/2, shape.maxY+MARKER_SIZE/2);
 		
 		Rect chunks = getChunkCoverage(position, markerShape);
-
-		System.out.println("\nChunk Coverage: "+chunks);
 		
 		int shapeMiddleX = (shape.minX + shape.maxX) / 2;
 		int shapeMiddleY = (shape.minY + shape.maxY) / 2;
@@ -277,9 +275,9 @@ public class AAORenderEventReciever {
 							/ CHUNK_SIZE;
 					float relativeChunkPositionY = (float) (marker.getZ() - position.zCoord)
 							/ CHUNK_SIZE;
-					int guiX = Math.round(shapeMiddleX - MARKER_SIZE/2 + relativeChunkPositionX
+					int guiX = (int)Math.floor(shapeMiddleX - MARKER_SIZE/2 + relativeChunkPositionX
 							* TILE_SIZE);
-					int guiY = Math.round(shapeMiddleY - MARKER_SIZE/2 + relativeChunkPositionY
+					int guiY = (int)Math.floor(shapeMiddleY - MARKER_SIZE/2 + relativeChunkPositionY
 							* TILE_SIZE);
 					renderMarker(marker, guiX, guiY, biomeData);
 				}
@@ -311,8 +309,10 @@ public class AAORenderEventReciever {
 		minChunkY -= 1;// IDK
 		int maxChunkX = (int) Math.ceil(position.xCoord / CHUNKSIZE
 				+ windowShape.getWidth() / (2f * TILE_SIZE));
+		maxChunkX += 1;
 		int maxChunkY = (int) Math.ceil(position.zCoord / CHUNKSIZE
 				+ windowShape.getHeight() / (2f * TILE_SIZE));
+		maxChunkY += 1;
 		return new Rect(minChunkX, minChunkY, maxChunkX, maxChunkY);
 	}
 
