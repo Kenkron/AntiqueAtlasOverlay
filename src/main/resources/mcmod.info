@@ -1,14 +1,14 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
+  "modid": "AntiqueAtlasOverlay",
+  "name": "Antique Atlas Overlay",
+  "description": "Minimap Addon for Antique Atlas.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
+  "authorList": ["Christopher Waugh"],
+  "credits": "The Forge and FML guys for the modding tools and Hunternif et al. for antique atlas.",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []

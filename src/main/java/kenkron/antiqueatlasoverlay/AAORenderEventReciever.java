@@ -111,8 +111,14 @@ public class AAORenderEventReciever {
 				shape.minY + Math.round(BORDER_Y * shape.getHeight()),
 				shape.maxX - Math.round(BORDER_X * shape.getWidth()),
 				shape.maxY - Math.round(BORDER_Y * shape.getHeight()));
-		drawMarkers(innerShape, atlasID, position, dimension, res);
 		drawTiles(innerShape, atlasID, position, dimension, res);
+		if (MARKER_SIZE>0){
+			drawMarkers(innerShape, atlasID, position, dimension, res);
+		}
+		// Overlay the frame so that edges of the map are smooth:
+		GL11.glColor4f(1, 1, 1, 1);
+		AtlasRenderHelper.drawFullTexture(Textures.BOOK_FRAME, shape.minX,
+		shape.minY, shape.getWidth(), shape.getHeight());
 	}
 
 	public void drawTiles(Rect shape, int atlasID, Vec3 position,
@@ -177,8 +183,6 @@ public class AAORenderEventReciever {
 		// the display window does not. We need to fix this
 		glScissorGUI(shape, res);
 
-		// double iconScale = getIconScale();
-
 		// biomeData needed to prevent undiscovered markers from appearing
 		DimensionData biomeData = AntiqueAtlasMod.atlasData.getAtlasData(
 				atlasID, Minecraft.getMinecraft().theWorld).getDimensionData(
@@ -202,66 +206,67 @@ public class AAORenderEventReciever {
 		// get GL back to normal
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		GL11.glColor4f(1, 1, 1, 1);
-
-		// Overlay the frame so that edges of the map are smooth:
-		/*
-		 * GL11.glColor4f(1, 1, 1, 1);
-		 * AtlasRenderHelper.drawFullTexture(Textures.BOOK_FRAME, getGuiX(),
-		 * getGuiY(), WIDTH, HEIGHT); double iconScale = getIconScale();
-		 * 
-		 * // Draw player icon: if (!state.is(HIDING_MARKERS)) { // How much the
-		 * player has moved from the top left corner of the // map, in pixels:
-		 * int playerOffsetX = (int) (player.posX * mapScale) + mapOffsetX; int
-		 * playerOffsetZ = (int) (player.posZ * mapScale) + mapOffsetY; if
-		 * (playerOffsetX < -MAP_WIDTH / 2) playerOffsetX = -MAP_WIDTH / 2; if
-		 * (playerOffsetX > MAP_WIDTH / 2) playerOffsetX = MAP_WIDTH / 2; if
-		 * (playerOffsetZ < -MAP_HEIGHT / 2) playerOffsetZ = -MAP_HEIGHT / 2; if
-		 * (playerOffsetZ > MAP_HEIGHT / 2 - 2) playerOffsetZ = MAP_HEIGHT / 2 -
-		 * 2; // Draw the icon: GL11.glColor4f(1, 1, 1, state.is(PLACING_MARKER)
-		 * ? 0.5f : 1); GL11.glPushMatrix(); GL11.glTranslated(getGuiX() + WIDTH
-		 * / 2 + playerOffsetX, getGuiY() + HEIGHT / 2 + playerOffsetZ, 0);
-		 * float playerRotation = (float) Math.round(player.rotationYaw / 360f
-		 * PLAYER_ROTATION_STEPS) / PLAYER_ROTATION_STEPS * 360f;
-		 * GL11.glRotatef(180 + playerRotation, 0, 0, 1);
-		 * GL11.glTranslated(-PLAYER_ICON_WIDTH / 2 * iconScale,
-		 * -PLAYER_ICON_HEIGHT / 2 * iconScale, 0);
-		 * AtlasRenderHelper.drawFullTexture(Textures.PLAYER, 0, 0, (int)
-		 * Math.round(PLAYER_ICON_WIDTH * iconScale), (int)
-		 * Math.round(PLAYER_ICON_HEIGHT * iconScale)); GL11.glPopMatrix();
-		 * GL11.glColor4f(1, 1, 1, 1); }
-		 * 
-		 * // Draw buttons: super.drawScreen(mouseX, mouseY, par3);
-		 * 
-		 * // Draw the semi-transparent marker attached to the cursor when
-		 * placing // a new marker: GL11.glEnable(GL11.GL_BLEND);
-		 * GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); if
-		 * (state.is(PLACING_MARKER)) { GL11.glColor4f(1, 1, 1, 0.5f);
-		 * AtlasRenderHelper.drawFullTexture(MarkerTextureMap.instance()
-		 * .getTexture(markerFinalizer.selectedType), mouseX - MARKER_SIZE / 2 *
-		 * iconScale, mouseY - MARKER_SIZE / 2 iconScale, (int)
-		 * Math.round(MARKER_SIZE * iconScale), (int) Math.round(MARKER_SIZE *
-		 * iconScale)); GL11.glColor4f(1, 1, 1, 1); }
-		 * 
-		 * // Draw progress overlay: if (state.is(EXPORTING_IMAGE)) {
-		 * drawDefaultBackground(); progressBar.draw((width - 100) / 2, height /
-		 * 2 - 34); }
-		 */
+		
+		// Draw player icon: if (!state.is(HIDING_MARKERS)) { // How much the
+		
+//		player has moved from the top left corner of the // map, in pixels:
+//		int playerOffsetX = (int) (player.posX * mapScale) + mapOffsetX; int
+//		playerOffsetZ = (int) (player.posZ * mapScale) + mapOffsetY; if
+//		(playerOffsetX < -MAP_WIDTH / 2) playerOffsetX = -MAP_WIDTH / 2; if
+//		(playerOffsetX > MAP_WIDTH / 2) playerOffsetX = MAP_WIDTH / 2; if
+//		(playerOffsetZ < -MAP_HEIGHT / 2) playerOffsetZ = -MAP_HEIGHT / 2; if
+//		(playerOffsetZ > MAP_HEIGHT / 2 - 2) playerOffsetZ = MAP_HEIGHT / 2 -
+//		2; // Draw the icon: GL11.glColor4f(1, 1, 1, state.is(PLACING_MARKER)
+//		? 0.5f : 1); GL11.glPushMatrix(); GL11.glTranslated(getGuiX() + WIDTH
+//		/ 2 + playerOffsetX, getGuiY() + HEIGHT / 2 + playerOffsetZ, 0);
+//		float playerRotation = (float) Math.round(player.rotationYaw / 360f
+//		PLAYER_ROTATION_STEPS) / PLAYER_ROTATION_STEPS * 360f;
+//		GL11.glRotatef(180 + playerRotation, 0, 0, 1);
+//		GL11.glTranslated(-PLAYER_ICON_WIDTH / 2 * iconScale,
+//		-PLAYER_ICON_HEIGHT / 2 * iconScale, 0);
+//		AtlasRenderHelper.drawFullTexture(Textures.PLAYER, 0, 0, (int)
+//		Math.round(PLAYER_ICON_WIDTH * iconScale), (int)
+//		Math.round(PLAYER_ICON_HEIGHT * iconScale)); GL11.glPopMatrix();
+//		GL11.glColor4f(1, 1, 1, 1); }
+//		
+//		// Draw buttons: super.drawScreen(mouseX, mouseY, par3);
+//		
+//		// Draw the semi-transparent marker attached to the cursor when
+//		placing // a new marker: GL11.glEnable(GL11.GL_BLEND);
+//		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); if
+//		(state.is(PLACING_MARKER)) { GL11.glColor4f(1, 1, 1, 0.5f);
+//		AtlasRenderHelper.drawFullTexture(MarkerTextureMap.instance()
+//		.getTexture(markerFinalizer.selectedType), mouseX - MARKER_SIZE / 2 *
+//		iconScale, mouseY - MARKER_SIZE / 2 iconScale, (int)
+//		Math.round(MARKER_SIZE * iconScale), (int) Math.round(MARKER_SIZE *
+//		iconScale)); GL11.glColor4f(1, 1, 1, 1); }
+		
 
 	}
 
 	protected void drawMarkersData(DimensionMarkersData markersData,
 			Rect shape, DimensionData biomeData, Vec3 position) {
 		
-		Rect chunks = getChunkCoverage(position, shape);
+		//this will be large enough to include markers that are larger than tiles
+		Rect markerShape = new Rect(shape.minX-MARKER_SIZE/2, shape.minY-MARKER_SIZE/2,
+				shape.maxX+MARKER_SIZE/2, shape.maxY+MARKER_SIZE/2);
+		
+		Rect chunks = getChunkCoverage(position, markerShape);
 
+		System.out.println("\nChunk Coverage: "+chunks);
+		
 		int shapeMiddleX = (shape.minX + shape.maxX) / 2;
 		int shapeMiddleY = (shape.minY + shape.maxY) / 2;
 
-		// Draw global markers:
-		for (int x = chunks.minX; x <= chunks.maxX; x++) {
-			for (int z = chunks.minY; z <= chunks.maxY; z++) {
-
-				List<Marker> markers = markersData.getMarkersAtChunk(x, z);
+		for (int x = chunks.minX; x <= chunks.maxX; x+=MarkersData.CHUNK_STEP) {
+			for (int z = chunks.minY; z <= chunks.maxY; z+=MarkersData.CHUNK_STEP) {
+				GL11.glBegin(GL11.GL_POINTS);
+				GL11.glVertex2f(x, z);
+				GL11.glEnd( );
+				//A marker chunk is greater than a Minecraft chunk
+				List<Marker> markers = markersData.getMarkersAtChunk(
+						(int)Math.floor(x*1f/MarkersData.CHUNK_STEP), 
+						(int)Math.floor(z*1f/MarkersData.CHUNK_STEP));
 				if (markers == null)
 					continue;
 				for (Marker marker : markers) {
@@ -272,9 +277,9 @@ public class AAORenderEventReciever {
 							/ CHUNK_SIZE;
 					float relativeChunkPositionY = (float) (marker.getZ() - position.zCoord)
 							/ CHUNK_SIZE;
-					int guiX = Math.round(shapeMiddleX + relativeChunkPositionX
+					int guiX = Math.round(shapeMiddleX - MARKER_SIZE/2 + relativeChunkPositionX
 							* TILE_SIZE);
-					int guiY = Math.round(shapeMiddleY + relativeChunkPositionY
+					int guiY = Math.round(shapeMiddleY - MARKER_SIZE/2 + relativeChunkPositionY
 							* TILE_SIZE);
 					renderMarker(marker, guiX, guiY, biomeData);
 				}
