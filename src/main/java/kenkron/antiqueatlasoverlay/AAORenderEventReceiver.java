@@ -36,7 +36,7 @@ import hunternif.mc.atlas.util.AtlasRenderHelper;
 import hunternif.mc.atlas.util.MathUtil;
 import hunternif.mc.atlas.util.Rect;
 
-public class AAORenderEventReciever {
+public class AAORenderEventReceiver {
 
 	/**
 	 * I know public variables can be messed with, but that's a risk I'm willing
