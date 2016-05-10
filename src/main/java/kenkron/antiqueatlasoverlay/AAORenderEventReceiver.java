@@ -63,6 +63,11 @@ public class AAORenderEventReceiver {
 	/** Size of markers on the minimap */
 	public int MARKER_SIZE = GuiAtlas.MARKER_SIZE / 2;
 
+
+	public int PLAYER_ICON_WIDTH = 7;
+	
+	public int PLAYER_ICON_HEIGHT = 8;
+	
 	/**
 	 * Number of blocks per chunk in minecraft. This is certianly stored
 	 * somewhere else, but I couldn't be bothered to find it.
@@ -93,12 +98,12 @@ public class AAORenderEventReceiver {
 				bounds.minY = gameheight - (HEIGHT + Y);
 			}
 			bounds.setSize(WIDTH, HEIGHT);
-			drawMinimap(bounds, atlas.intValue(), player.getPosition(1),
+			drawMinimap(bounds, atlas.intValue(), player.getPosition(1), player.getRotationYawHead(),
 					player.dimension, event.resolution);
 		}
 	}
 
-	public void drawMinimap(Rect shape, int atlasID, Vec3 position,
+	public void drawMinimap(Rect shape, int atlasID, Vec3 position, float rotation,
 			int dimension, ScaledResolution res) {
 		GL11.glColor4f(1, 1, 1, 1);
 		GL11.glAlphaFunc(GL11.GL_GREATER, 0); // So light detail on tiles is
@@ -114,6 +119,9 @@ public class AAORenderEventReceiver {
 		drawTiles(innerShape, atlasID, position, dimension, res);
 		if (MARKER_SIZE>0){
 			drawMarkers(innerShape, atlasID, position, dimension, res);
+			int shapeMiddleX = (shape.minX + shape.maxX) / 2;
+			int shapeMiddleY = (shape.minY + shape.maxY) / 2;
+			drawPlayer(shapeMiddleX, shapeMiddleY, position, rotation);
 		}
 		// Overlay the frame so that edges of the map are smooth:
 		GL11.glColor4f(1, 1, 1, 1);
@@ -157,7 +165,6 @@ public class AAORenderEventReceiver {
 						+ iteratorScope.minX - chunkPosition.xCoord);
 				float relativeChunkPositionY = (float) (subtile.y / 2.0
 						+ iteratorScope.minY - chunkPosition.zCoord);
-				// TODO: this is slow
 				renderer.addTileCorner(
 						BiomeTextureMap.instance().getTexture(subtile.tile),
 						shapeMiddleX
@@ -166,7 +173,7 @@ public class AAORenderEventReceiver {
 						shapeMiddleY
 								+ (int) Math.floor(relativeChunkPositionY
 										* TILE_SIZE), subtile.getTextureU(),
-						subtile.getTextureV());/**/
+						subtile.getTextureV());
 			}
 		}
 		renderer.draw();
@@ -206,42 +213,18 @@ public class AAORenderEventReceiver {
 		// get GL back to normal
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 		GL11.glColor4f(1, 1, 1, 1);
+	}
+	
+	public void drawPlayer(float x, float y, Vec3 posisiton, float rotation){
+		// Draw player icon:
 		
-		// Draw player icon: if (!state.is(HIDING_MARKERS)) { // How much the
-		
-//		player has moved from the top left corner of the // map, in pixels:
-//		int playerOffsetX = (int) (player.posX * mapScale) + mapOffsetX; int
-//		playerOffsetZ = (int) (player.posZ * mapScale) + mapOffsetY; if
-//		(playerOffsetX < -MAP_WIDTH / 2) playerOffsetX = -MAP_WIDTH / 2; if
-//		(playerOffsetX > MAP_WIDTH / 2) playerOffsetX = MAP_WIDTH / 2; if
-//		(playerOffsetZ < -MAP_HEIGHT / 2) playerOffsetZ = -MAP_HEIGHT / 2; if
-//		(playerOffsetZ > MAP_HEIGHT / 2 - 2) playerOffsetZ = MAP_HEIGHT / 2 -
-//		2; // Draw the icon: GL11.glColor4f(1, 1, 1, state.is(PLACING_MARKER)
-//		? 0.5f : 1); GL11.glPushMatrix(); GL11.glTranslated(getGuiX() + WIDTH
-//		/ 2 + playerOffsetX, getGuiY() + HEIGHT / 2 + playerOffsetZ, 0);
-//		float playerRotation = (float) Math.round(player.rotationYaw / 360f
-//		PLAYER_ROTATION_STEPS) / PLAYER_ROTATION_STEPS * 360f;
-//		GL11.glRotatef(180 + playerRotation, 0, 0, 1);
-//		GL11.glTranslated(-PLAYER_ICON_WIDTH / 2 * iconScale,
-//		-PLAYER_ICON_HEIGHT / 2 * iconScale, 0);
-//		AtlasRenderHelper.drawFullTexture(Textures.PLAYER, 0, 0, (int)
-//		Math.round(PLAYER_ICON_WIDTH * iconScale), (int)
-//		Math.round(PLAYER_ICON_HEIGHT * iconScale)); GL11.glPopMatrix();
-//		GL11.glColor4f(1, 1, 1, 1); }
-//		
-//		// Draw buttons: super.drawScreen(mouseX, mouseY, par3);
-//		
-//		// Draw the semi-transparent marker attached to the cursor when
-//		placing // a new marker: GL11.glEnable(GL11.GL_BLEND);
-//		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA); if
-//		(state.is(PLACING_MARKER)) { GL11.glColor4f(1, 1, 1, 0.5f);
-//		AtlasRenderHelper.drawFullTexture(MarkerTextureMap.instance()
-//		.getTexture(markerFinalizer.selectedType), mouseX - MARKER_SIZE / 2 *
-//		iconScale, mouseY - MARKER_SIZE / 2 iconScale, (int)
-//		Math.round(MARKER_SIZE * iconScale), (int) Math.round(MARKER_SIZE *
-//		iconScale)); GL11.glColor4f(1, 1, 1, 1); }
-		
-
+		GL11.glPushMatrix(); 
+		GL11.glTranslated(x, y, 0);
+		GL11.glRotatef(180 + rotation, 0, 0, 1);
+		GL11.glTranslated(-PLAYER_ICON_WIDTH/ 2, -PLAYER_ICON_HEIGHT/2, 0);
+		AtlasRenderHelper.drawFullTexture(Textures.PLAYER, 0, 0, PLAYER_ICON_WIDTH, PLAYER_ICON_HEIGHT); 
+		GL11.glPopMatrix();
+		GL11.glColor4f(1, 1, 1, 1);
 	}
 
 	protected void drawMarkersData(DimensionMarkersData markersData,

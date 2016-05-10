@@ -64,11 +64,20 @@ public class AAOConfig {
 								+ "the map may look better with a TILE_SIZE of 16 or more.\n");
 
 		receiver.MARKER_SIZE = config.getInt("MARKER_SIZE", APPEARANCE,
-				receiver.MARKER_SIZE, 1, Integer.MAX_VALUE,
+				receiver.MARKER_SIZE, 0, Integer.MAX_VALUE,
 				"The size (in GUI pixels) of a marker on the map.\n"
 						+ "Note that this will change with Minecraft's "
 						+ "GUI scale configuration.\n");
 
+		receiver.PLAYER_ICON_WIDTH = config.getInt("PLAYER_ICON_WIDTH", APPEARANCE,
+				receiver.PLAYER_ICON_WIDTH, 0, Integer.MAX_VALUE,
+				"The width (in GUI pixels) of the player's icon.\n");
+		
+
+		receiver.PLAYER_ICON_HEIGHT = config.getInt("PLAYER_ICON_HEIGHT", APPEARANCE,
+				receiver.PLAYER_ICON_HEIGHT, 0, Integer.MAX_VALUE,
+				"The height (in GUI pixels) of the player's icon.\n");
+		
 		receiver.BORDER_X = config
 				.getFloat(
 						"BORDER_X",
