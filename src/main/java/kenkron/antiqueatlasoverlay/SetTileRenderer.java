@@ -6,10 +6,7 @@ import java.util.HashMap;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
-
-import hunternif.mc.atlas.util.AtlasRenderHelper;
 
 /**The minimap render is a bit slow.  The function that really takes time is
  * AtlasRenderHelper.drawAutotileCorner(...).  This class makes it faster by
@@ -30,7 +27,7 @@ public class SetTileRenderer {
 	
 	public SetTileRenderer(int tileHalfSize){
 		this.tileHalfSize=tileHalfSize;
-		subjects = new HashMap();
+		subjects = new HashMap<ResourceLocation, ArrayList<TileCorner>>();
 	}
 
 	public void addTileCorner(ResourceLocation texture, int x, int y, int u, int v){

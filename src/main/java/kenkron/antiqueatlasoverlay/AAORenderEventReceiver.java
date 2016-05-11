@@ -1,26 +1,20 @@
 package kenkron.antiqueatlasoverlay;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.lwjgl.opengl.Drawable;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import cpw.mods.fml.common.eventhandler.*;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import hunternif.mc.atlas.AntiqueAtlasMod;
-import hunternif.mc.atlas.api.AtlasAPI;
 import hunternif.mc.atlas.client.BiomeTextureMap;
 import hunternif.mc.atlas.client.SubTile;
 import hunternif.mc.atlas.client.SubTileQuartet;
@@ -33,7 +27,6 @@ import hunternif.mc.atlas.marker.Marker;
 import hunternif.mc.atlas.marker.MarkerTextureMap;
 import hunternif.mc.atlas.marker.MarkersData;
 import hunternif.mc.atlas.util.AtlasRenderHelper;
-import hunternif.mc.atlas.util.MathUtil;
 import hunternif.mc.atlas.util.Rect;
 
 public class AAORenderEventReceiver {
@@ -74,7 +67,7 @@ public class AAORenderEventReceiver {
 	 */
 	public static final int CHUNK_SIZE = 16;
 
-	@SubscribeEvent(priority = cpw.mods.fml.common.eventhandler.EventPriority.NORMAL)
+	@SubscribeEvent(priority = EventPriority.NORMAL)
 	public void eventHandler(RenderGameOverlayEvent event) {
 		EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
 		Integer atlas = null;
@@ -98,7 +91,7 @@ public class AAORenderEventReceiver {
 				bounds.minY = gameheight - (HEIGHT + Y);
 			}
 			bounds.setSize(WIDTH, HEIGHT);
-			drawMinimap(bounds, atlas.intValue(), player.getPosition(1), player.getRotationYawHead(),
+			drawMinimap(bounds, atlas.intValue(), player.getPositionVector(), player.getRotationYawHead(),
 					player.dimension, event.resolution);
 		}
 	}
@@ -149,7 +142,7 @@ public class AAORenderEventReceiver {
 		iter.setScope(iteratorScope);
 
 		iter.setStep(1);
-		Vec3 chunkPosition = Vec3.createVectorHelper(position.xCoord
+		Vec3 chunkPosition =new Vec3(position.xCoord
 				/ CHUNK_SIZE, position.yCoord / CHUNK_SIZE, position.zCoord
 				/ CHUNK_SIZE);
 		int shapeMiddleX = (shape.minX + shape.maxX) / 2;
