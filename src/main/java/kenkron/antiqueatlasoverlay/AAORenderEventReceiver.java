@@ -229,20 +229,25 @@ public class AAORenderEventReceiver {
 		Rect markerShape = new Rect(shape.minX-MARKER_SIZE/2, shape.minY-MARKER_SIZE/2,
 				shape.maxX+MARKER_SIZE/2, shape.maxY+MARKER_SIZE/2);
 		
-		Rect chunks = getChunkCoverage(position, markerShape);
+		Rect mcchunks = getChunkCoverage(position, markerShape);
+		Rect chunks = new Rect((int)Math.floor(mcchunks.minX/MarkersData.CHUNK_STEP),
+				(int)Math.floor(mcchunks.minY/MarkersData.CHUNK_STEP),
+				(int)Math.ceil(mcchunks.maxX/MarkersData.CHUNK_STEP),
+				(int)Math.ceil(mcchunks.maxY/MarkersData.CHUNK_STEP));
 		
 		int shapeMiddleX = (shape.minX + shape.maxX) / 2;
 		int shapeMiddleY = (shape.minY + shape.maxY) / 2;
 
-		for (int x = chunks.minX; x <= chunks.maxX; x+=MarkersData.CHUNK_STEP) {
-			for (int z = chunks.minY; z <= chunks.maxY; z+=MarkersData.CHUNK_STEP) {
+		System.out.println((chunks.minX+chunks.maxX)*8*MarkersData.CHUNK_STEP+", "+(chunks.minY+chunks.maxY)*8*MarkersData.CHUNK_STEP);
+		for (int x = chunks.minX; x <= chunks.maxX; x++) {
+			for (int z = chunks.minY; z <= chunks.maxY; z++) {
 				GL11.glBegin(GL11.GL_POINTS);
 				GL11.glVertex2f(x, z);
 				GL11.glEnd( );
 				//A marker chunk is greater than a Minecraft chunk
 				List<Marker> markers = markersData.getMarkersAtChunk(
-						(int)Math.floor(x*1f/MarkersData.CHUNK_STEP), 
-						(int)Math.floor(z*1f/MarkersData.CHUNK_STEP));
+						Math.round(x), 
+						Math.round(z));
 				if (markers == null)
 					continue;
 				for (Marker marker : markers) {
