@@ -13,7 +13,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 public class AntiqueAtlasOverlayMod
 {
     public static final String MODID = "AntiqueAtlasOverlay";
-    public static final String VERSION = "1.0";
+    public static final String VERSION = "1.2";
     
     AAORenderEventReceiver renderer;
     
