@@ -68,7 +68,10 @@ public class AAORenderEventReceiver {
 	public static final int CHUNK_SIZE = 16;
 
 	@SubscribeEvent(priority = EventPriority.NORMAL)
-	public void eventHandler(RenderGameOverlayEvent event) {
+	public void eventHandler(RenderGameOverlayEvent.Post event) {
+		if (event.type != RenderGameOverlayEvent.ElementType.ALL) {
+			return; // chose a random element type to use for all overlays
+		}
 		EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
 		Integer atlas = null;
 		if (REQUIRES_HOLD) {
@@ -238,7 +241,6 @@ public class AAORenderEventReceiver {
 		int shapeMiddleX = (shape.minX + shape.maxX) / 2;
 		int shapeMiddleY = (shape.minY + shape.maxY) / 2;
 
-		System.out.println((chunks.minX+chunks.maxX)*8*MarkersData.CHUNK_STEP+", "+(chunks.minY+chunks.maxY)*8*MarkersData.CHUNK_STEP);
 		for (int x = chunks.minX; x <= chunks.maxX; x++) {
 			for (int z = chunks.minY; z <= chunks.maxY; z++) {
 				GL11.glBegin(GL11.GL_POINTS);
