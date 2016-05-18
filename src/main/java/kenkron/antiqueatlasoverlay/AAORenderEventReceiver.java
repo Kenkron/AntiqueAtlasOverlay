@@ -73,6 +73,10 @@ public class AAORenderEventReceiver {
 	 * somewhere else, but I couldn't be bothered to find it.
 	 */
 	public static final int CHUNK_SIZE = 16;
+	
+	AtlasDataHandler adh = new AtlasDataHandler();
+	
+	MarkersDataHandler mdh = new MarkersDataHandler();
 
 	@SubscribeEvent(priority = cpw.mods.fml.common.eventhandler.EventPriority.NORMAL)
 	public void eventHandler(RenderGameOverlayEvent.Post event) {
@@ -143,7 +147,7 @@ public class AAORenderEventReceiver {
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-		DimensionData biomeData = AntiqueAtlasMod.atlasData.getAtlasData(
+		DimensionData biomeData = adh.getAtlasData(
 				atlasID, Minecraft.getMinecraft().theWorld).getDimensionData(
 				dimension);
 
@@ -196,7 +200,7 @@ public class AAORenderEventReceiver {
 		glScissorGUI(shape, res);
 
 		// biomeData needed to prevent undiscovered markers from appearing
-		DimensionData biomeData = AntiqueAtlasMod.atlasData.getAtlasData(
+		DimensionData biomeData = adh.getAtlasData(
 				atlasID, Minecraft.getMinecraft().theWorld).getDimensionData(
 				dimension);
 		DimensionMarkersData globalMarkersData = AntiqueAtlasMod.globalMarkersData
@@ -205,7 +209,7 @@ public class AAORenderEventReceiver {
 		// Draw global markers:
 		drawMarkersData(globalMarkersData, shape, biomeData, position);
 
-		MarkersData markersData = AntiqueAtlasMod.markersData.getMarkersData(
+		MarkersData markersData = mdh.getMarkersData(
 				atlasID, Minecraft.getMinecraft().theWorld);
 		DimensionMarkersData localMarkersData = null;
 		if (markersData != null) {
