@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
@@ -101,9 +102,9 @@ public class AAORenderEventReceiver {
 
 	public void drawMinimap(Rect shape, int atlasID, Vec3 position, float rotation,
 			int dimension, ScaledResolution res) {
-		GL11.glColor4f(1, 1, 1, 1);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glAlphaFunc(GL11.GL_GREATER, 0); // So light detail on tiles is
+		GlStateManager.color(1, 1, 1, 1);
+		GlStateManager.enableBlend();
+		GlStateManager.alphaFunc(GL11.GL_GREATER, 0); // So light detail on tiles is
 												// visible
 		AtlasRenderHelper.drawFullTexture(Textures.BOOK, shape.minX,
 				shape.minY, shape.getWidth(), shape.getHeight());
@@ -121,10 +122,10 @@ public class AAORenderEventReceiver {
 			drawPlayer(shapeMiddleX, shapeMiddleY, position, rotation);
 		}
 		// Overlay the frame so that edges of the map are smooth:
-		GL11.glColor4f(1, 1, 1, 1);
+		GlStateManager.color(1, 1, 1, 1);
 		AtlasRenderHelper.drawFullTexture(Textures.BOOK_FRAME, shape.minX,
 		shape.minY, shape.getWidth(), shape.getHeight());
-		GL11.glDisable(GL11.GL_BLEND);
+		GlStateManager.disableBlend();
 	}
 
 	public void drawTiles(Rect shape, int atlasID, Vec3 position,
@@ -133,8 +134,8 @@ public class AAORenderEventReceiver {
 		// glScissor uses the default window coordinates,
 		// the display window does not. We need to fix this
 		glScissorGUI(shape, res);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GlStateManager.enableBlend();
+		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
 		DimensionData biomeData = AntiqueAtlasMod.atlasData.getAtlasData(
 				atlasID, Minecraft.getMinecraft().theWorld).getDimensionData(
@@ -177,7 +178,7 @@ public class AAORenderEventReceiver {
 		renderer.draw();
 		// get GL back to normal
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
-		GL11.glColor4f(1, 1, 1, 1);
+		GlStateManager.color(1, 1, 1, 1);
 	}
 
 	public void drawMarkers(Rect shape, int atlasID, Vec3 position,
@@ -210,19 +211,19 @@ public class AAORenderEventReceiver {
 
 		// get GL back to normal
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
-		GL11.glColor4f(1, 1, 1, 1);
+		GlStateManager.color(1, 1, 1, 1);
 	}
 	
 	public void drawPlayer(float x, float y, Vec3 posisiton, float rotation){
 		// Draw player icon:
 		
-		GL11.glPushMatrix(); 
-		GL11.glTranslated(x, y, 0);
-		GL11.glRotatef(180 + rotation, 0, 0, 1);
-		GL11.glTranslated(-PLAYER_ICON_WIDTH/ 2, -PLAYER_ICON_HEIGHT/2, 0);
+		GlStateManager.pushMatrix(); 
+		GlStateManager.translate(x, y, 0);
+		GlStateManager.rotate(180 + rotation, 0, 0, 1);
+		GlStateManager.translate(-PLAYER_ICON_WIDTH/ 2, -PLAYER_ICON_HEIGHT/2, 0);
 		AtlasRenderHelper.drawFullTexture(Textures.PLAYER, 0, 0, PLAYER_ICON_WIDTH, PLAYER_ICON_HEIGHT); 
-		GL11.glPopMatrix();
-		GL11.glColor4f(1, 1, 1, 1);
+		GlStateManager.popMatrix();
+		GlStateManager.color(1, 1, 1, 1);
 	}
 
 	protected void drawMarkersData(DimensionMarkersData markersData,
@@ -243,9 +244,6 @@ public class AAORenderEventReceiver {
 
 		for (int x = chunks.minX; x <= chunks.maxX; x++) {
 			for (int z = chunks.minY; z <= chunks.maxY; z++) {
-				GL11.glBegin(GL11.GL_POINTS);
-				GL11.glVertex2f(x, z);
-				GL11.glEnd( );
 				//A marker chunk is greater than a Minecraft chunk
 				List<Marker> markers = markersData.getMarkersAtChunk(
 						Math.round(x), 
@@ -276,8 +274,8 @@ public class AAORenderEventReceiver {
 				&& !biomeData.hasTileAt(marker.getChunkX(), marker.getChunkZ())) {
 			return;
 		}
-		GL11.glColor4f(1, 1, 1, 1);
-		SetTileRenderer.drawTexture(MarkerTextureMap
+		GlStateManager.color(1, 1, 1, 1);
+		AtlasRenderHelper.drawFullTexture(MarkerTextureMap
 				.instance().getTexture(marker.getType()), x, y, MARKER_SIZE,
 				MARKER_SIZE);
 //		 AtlasRenderHelper.drawFullTexture(MarkerTextureMap.instance()

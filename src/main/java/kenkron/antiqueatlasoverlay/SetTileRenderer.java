@@ -6,6 +6,9 @@ import java.util.HashMap;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 
 /**The minimap render is a bit slow.  The function that really takes time is
@@ -43,11 +46,14 @@ public class SetTileRenderer {
 		for (ResourceLocation key: subjects.keySet()){
 			ArrayList<TileCorner> tca = subjects.get(key);
 			Minecraft.getMinecraft().renderEngine.bindTexture(key);
-			GL11.glBegin(GL11.GL_QUADS);
+
+			Tessellator tessellator = Tessellator.getInstance();
+			WorldRenderer renderer = tessellator.getWorldRenderer();
+			renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 			for (TileCorner tc: tca){
 				drawInlineAutotileCorner(tc.x, tc.y, tc.u, tc.v);
 			}
-			GL11.glEnd();
+			tessellator.draw();
 		}
 	}
 	
@@ -57,29 +63,27 @@ public class SetTileRenderer {
 		float maxU =(u + 1) / 4f;
 		float minV = v / 6f;
 		float maxV =(v + 1) / 6f;
-		GL11.glTexCoord2f(maxU, maxV);
-		GL11.glVertex2f(x+tileHalfSize, y+ tileHalfSize);
-		GL11.glTexCoord2f(maxU, minV);
-		GL11.glVertex2f(x+tileHalfSize,y);
-		GL11.glTexCoord2f(minU, minV);
-		GL11.glVertex2f(x,y);
-		GL11.glTexCoord2f(minU, maxV);
-		GL11.glVertex2f(x,y+ tileHalfSize);
+		Tessellator tessellator = Tessellator.getInstance();
+		WorldRenderer renderer = tessellator.getWorldRenderer();
+		renderer.pos(x+tileHalfSize, y+ tileHalfSize,0).tex(maxU, maxV).endVertex();
+		renderer.pos(x+tileHalfSize,y,0).tex(maxU, minV).endVertex();
+		renderer.pos(x,y,0).tex(minU, minV).endVertex();
+		renderer.pos(x,y+ tileHalfSize,0).tex(minU, maxV).endVertex();
 	}
 	
-	/**This does not improve framerate...*/
-	public static void drawTexture(ResourceLocation texture, int x, int y, int w, int h) {
-		//Effectively a call to GL11.glBindTexture(GL11.GL_TEXTURE_2D, p_94277_0_);
-		Minecraft.getMinecraft().renderEngine.bindTexture(texture);
-		GL11.glBegin(GL11.GL_QUADS);
-		GL11.glTexCoord2f(1, 1);
-		GL11.glVertex2f(x+w, y+h);
-		GL11.glTexCoord2f(1, 0);
-		GL11.glVertex2f(x+w,y);
-		GL11.glTexCoord2f(0, 0);
-		GL11.glVertex2f(x,y);
-		GL11.glTexCoord2f(0, 1);
-		GL11.glVertex2f(x,y+h);
-		GL11.glEnd();
-	}
+//	/**This does not improve framerate...*/
+//	public static void drawTexture(ResourceLocation texture, int x, int y, int w, int h) {
+//		//Effectively a call to GL11.glBindTexture(GL11.GL_TEXTURE_2D, p_94277_0_);
+//		Minecraft.getMinecraft().renderEngine.bindTexture(texture);
+//		GL11.glBegin(GL11.GL_QUADS);
+//		GL11.glTexCoord2f(1, 1);
+//		GL11.glVertex2f(x+w, y+h);
+//		GL11.glTexCoord2f(1, 0);
+//		GL11.glVertex2f(x+w,y);
+//		GL11.glTexCoord2f(0, 0);
+//		GL11.glVertex2f(x,y);
+//		GL11.glTexCoord2f(0, 1);
+//		GL11.glVertex2f(x,y+h);
+//		GL11.glEnd();
+//	}
 }
